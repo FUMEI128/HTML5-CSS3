@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title></title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<style>
+.text,canvas{
+    width:300px;
+    height:150px; 
+    position:absolute; 
+    left:600px;
+    border-radius: 5px; 
+    }
+    .text{
+        font-size:55px;
+        font-family: "正楷";
+        font-weight: bold;
+        color:rgb(172, 50, 76);
+        line-height:130px;
+        margin-left:60px;
+    }
+    .canvas{
+        border:#26acf0 3px solid;
+    }
+</style>
+</head>
+<body>
+ <div class="text" id="text" ></div>
+ <canvas id="canvas" class="canvas" width="300" height="150"></canvas>
+</body>
+<script>
+        var canvas = document.getElementById("canvas");
+        var text=document.getElementById("text");
+        var covercanvas = canvas.getContext("2d");
+        //插入文字
+        var arr=["一等奖","二等奖","三等奖","谢谢惠顾"];
+            var str=arr[parseInt(Math.random()*3)];
+            text.innerHTML=str;
+        //遮罩层
+        covercanvas.fillStyle="transparent";
+        covercanvas.fillStyle="#ccc";
+        covercanvas.fillRect(0,0,300,150);
+        //实现点击或滑动出现透明圆
+        //判断是鼠标如果是点击就直接画透明圆，如果是moursedown然后再移动调用函数画圆
+        var flag=false;
+        function onDown(e){
+        //点击了鼠标
+            flag=true;
+            console.log("ondown");
+            var x=event.clientX-600;
+            var y=event.clientY;
+            covercanvas.beginPath();
+            covercanvas.arc(x,y,40,0,2*Math.PI);
+            covercanvas.fill();
+            covercanvas.closePath();
+            clear();
+        }
+        function onUp(e){
+            e.preventDefault();
+            flag=false;
+            // console.log("onup");
+        }
+        function dreawArc(event){
+            if(!flag)
+            {
+                return false;
+            }
+            var x=event.clientX-600;
+            var y=event.clientY;
+            covercanvas.beginPath();
+            covercanvas.arc(x,y,40,0,2*Math.PI);
+            covercanvas.fill();
+            covercanvas.closePath();
+            clear();
+            console.log("moursemove");
+
+        }
+        covercanvas.globalCompositeOperation="destination-out";
+        canvas.addEventListener("mousedown",onDown,false);
+        canvas.addEventListener("mousemove",dreawArc,false);
+        canvas.addEventListener("mouseup",onUp,false);
+
+        function clear(){
+            imgData = covercanvas.getImageData(0,0,300,150);
+            // console.log(imgData.data.length);
+            var data=imgData.data;
+            for(var i=0 , j=0 ; i< data.length;i+=4){
+                if(data[i]!=204&&(data[i+1]!=204)&&(data[i+2]!=204))
+                {
+                    j++; 
+                }
+
+            }
+            // console.log(j*4/data.length);
+            if(j>(data.length/4)*0.6){
+                    covercanvas.clearRect(0,0,300,150);
+                }
+        }
+
+</script>
+</html>
